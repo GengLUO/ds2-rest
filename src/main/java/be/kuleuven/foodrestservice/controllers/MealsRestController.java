@@ -6,6 +6,7 @@ import be.kuleuven.foodrestservice.exceptions.MealNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -52,6 +53,27 @@ public class MealsRestController {
     public EntityModel<Meal> getLargestMeal() {
         Meal meal = mealsRepository.findLargestMeal();
         return mealToEntityModel(meal.getId(), meal);
+    }
+
+    @PostMapping("/rest/meals")
+    @ResponseStatus(HttpStatus.CREATED)
+    public EntityModel<Meal> addMeal(@RequestBody Meal meal) {
+        Meal newMeal = mealsRepository.addMeal(meal);
+        return mealToEntityModel(newMeal.getId(),newMeal);
+    }
+
+    @PutMapping("/rest/meals/{id}")
+    public EntityModel<Meal> updateMeal(@PathVariable String id, @RequestBody Meal updatedMeal) {
+        Meal meal = mealsRepository.updateMeal(id, updatedMeal)
+                .orElseThrow(() -> new MealNotFoundException(id));
+        return mealToEntityModel(meal.getId(),meal);
+    }
+
+    @DeleteMapping("/rest/meals/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMeal(@PathVariable String id) {
+        mealsRepository.deleteMeal(id)
+                .orElseThrow(() -> new MealNotFoundException("Could not find meal " + id));
     }
 
     private EntityModel<Meal> mealToEntityModel(String id, Meal meal) {

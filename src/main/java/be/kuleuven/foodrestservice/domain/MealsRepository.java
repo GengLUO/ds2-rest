@@ -68,4 +68,25 @@ public class MealsRepository {
                 .orElseThrow(() -> new IllegalArgumentException("No meals available"));
     }
 
+    public Meal addMeal(Meal meal) {
+        Assert.notNull(meal, "The meal cannot be null");
+        meals.put(meal.getId(), meal);
+        return meal;
+    }
+
+    public Optional<Meal> updateMeal(String id, Meal updatedMeal) {
+        Assert.notNull(id, "The meal id must not be null");
+        Assert.notNull(updatedMeal, "The updated meal cannot be null");
+        if (!meals.containsKey(id)) {
+            return Optional.empty();
+        }
+        updatedMeal.setId(id);
+        meals.put(id, updatedMeal);
+        return Optional.of(updatedMeal);
+    }
+
+    public Optional<Meal> deleteMeal(String id) {
+        Assert.notNull(id, "The meal id must not be null");
+        return Optional.ofNullable(meals.remove(id));
+    }
 }

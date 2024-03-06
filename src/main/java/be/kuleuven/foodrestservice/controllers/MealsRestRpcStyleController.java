@@ -4,6 +4,7 @@ import be.kuleuven.foodrestservice.domain.Meal;
 import be.kuleuven.foodrestservice.domain.MealsRepository;
 import be.kuleuven.foodrestservice.exceptions.MealNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -41,5 +42,23 @@ public class MealsRestRpcStyleController {
         return mealsRepository.findLargestMeal();
     }
 
+    @PostMapping("/restrpc/meals")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Meal addMeal(@RequestBody Meal meal) {
+        return mealsRepository.addMeal(meal);
+    }
+
+    @PutMapping("/restrpc/meals/{id}")
+    public Meal updateMeal(@PathVariable String id, @RequestBody Meal updatedMeal) {
+        return mealsRepository.updateMeal(id, updatedMeal)
+                .orElseThrow(() -> new MealNotFoundException(id));
+    }
+
+    @DeleteMapping("/restrpc/meals/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteMeal(@PathVariable String id) {
+        mealsRepository.deleteMeal(id)
+                .orElseThrow(() -> new MealNotFoundException(id));
+    }
 
 }

@@ -1,5 +1,6 @@
 package be.kuleuven.foodrestservice.domain;
 
+import be.kuleuven.foodrestservice.exceptions.MealNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -54,4 +55,17 @@ public class MealsRepository {
     public Collection<Meal> getAllMeal() {
         return meals.values();
     }
+
+    public Meal findCheapestMeal() {
+        return getAllMeal().stream()
+                .min(Comparator.comparing(Meal::getPrice))
+                .orElseThrow(() -> new IllegalArgumentException("No meals available"));
+    }
+
+    public Meal findLargestMeal() {
+        return getAllMeal().stream()
+                .max(Comparator.comparing(Meal::getKcal))
+                .orElseThrow(() -> new IllegalArgumentException("No meals available"));
+    }
+
 }

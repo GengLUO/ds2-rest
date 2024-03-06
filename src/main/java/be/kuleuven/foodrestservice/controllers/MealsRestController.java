@@ -2,12 +2,15 @@ package be.kuleuven.foodrestservice.controllers;
 
 import be.kuleuven.foodrestservice.domain.Meal;
 import be.kuleuven.foodrestservice.domain.MealsRepository;
+import be.kuleuven.foodrestservice.domain.Order;
 import be.kuleuven.foodrestservice.exceptions.MealNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -75,6 +78,35 @@ public class MealsRestController {
         mealsRepository.deleteMeal(id)
                 .orElseThrow(() -> new MealNotFoundException("Could not find meal " + id));
     }
+
+    @PostMapping("/rest/orders")
+    public ResponseEntity<String> orderMeals(@RequestBody Order order) {
+        // Validate the order details
+        if (order.getMealIds() == null || order.getMealIds().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Meal IDs must not be empty");
+        }
+
+        // Fetch the meals and calculate the total price
+        double totalPrice = 0;
+        for (String mealId : order.getMealIds()) {
+            Meal meal = mealsRepository.findMeal(mealId)
+                    .orElseThrow(() -> new MealNotFoundException("Could not find meal " + mealId));
+            totalPrice += meal.getPrice();
+        }
+
+        // Here, you might want to implement additional logic such as updating inventory, saving the order details, etc.
+
+        // Create a simple confirmation message
+        String confirmationMessage = String.format("Order placed successfully! Total price: %.2f", totalPrice);
+
+//        // Create and return the response entity with HATEOAS support
+//        EntityModel<String> entityModel = EntityModel.of(confirmationMessage,
+//                linkTo(methodOn(MealsRestController.class).orderMeals(order)).withSelfRel());
+//
+//        return ResponseEntity.status(HttpStatus.CREATED).body(entityModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(confirmationMessage);
+    }
+
 
     private EntityModel<Meal> mealToEntityModel(String id, Meal meal) {
         return EntityModel.of(meal,

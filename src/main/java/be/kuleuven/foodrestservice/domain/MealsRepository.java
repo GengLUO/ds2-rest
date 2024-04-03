@@ -6,11 +6,12 @@ import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class MealsRepository {
     // map: id -> meal
-    private static final Map<String, Meal> meals = new HashMap<>();
+    private static final Map<String, Meal> meals = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void initData() {

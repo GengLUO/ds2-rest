@@ -1,0 +1,1 @@
+scp target/food-rest-service-0.0.1-SNAPSHOT.jar geng@dskul.australiaeast.cloudapp.azure.com:~/rest/
